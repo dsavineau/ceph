@@ -116,6 +116,20 @@ class TestBatch(object):
         report = b._create_report(plan)
         json.loads(report)
 
+    def test_batch_sort_full_ssd(self, factory):
+        device1 = factory(used_by_ceph=False, available=True, rotational=0, abspath="/dev/sda")
+        device2 = factory(used_by_ceph=False, available=True, rotational=0, abspath="/dev/sdb")
+        device3 = factory(used_by_ceph=False, available=True, rotational=0, abspath="/dev/sdc")
+        devices = [device1, device2, device3]
+        args = factory(report=True,
+                       devices=devices,
+                       filestore=False,
+                      )
+        b = batch.Batch([])
+        b.args = args
+        b._sort_rotational_disks()
+        assert len(b.args.devices) == 3
+
     def test_get_physical_osds_return_len(self, factory,
                                           mock_devices_available,
                                           conf_ceph_stub,
