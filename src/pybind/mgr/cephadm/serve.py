@@ -380,14 +380,14 @@ class CephadmServe:
                     daemon_id = s.get('id')
                     assert daemon_id
                     name = '%s.%s' % (s.get('type'), daemon_id)
-                    if s.get('type') == 'rbd-mirror':
+                    if s.get('type') in ['rbd-mirror', 'cephfs-mirror']:
                         metadata = self.mgr.get_metadata(
-                            "rbd-mirror", daemon_id)
+                            s.get('type'), daemon_id)
                         try:
                             name = '%s.%s' % (s.get('type'), metadata['id'])
                         except (KeyError, TypeError):
                             self.log.debug(
-                                "Failed to find daemon id for rbd-mirror service %s" % (s.get('id')))
+                                "Failed to find daemon id for %d service %s" % (s.get('type'), s.get('id')))
 
                     if host not in self.mgr.inventory:
                         missing_names.append(name)

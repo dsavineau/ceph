@@ -223,7 +223,7 @@ class TimeoutExpired(Error):
 
 class Ceph(object):
     daemons = ('mon', 'mgr', 'mds', 'osd', 'rgw', 'rbd-mirror',
-               'crash')
+               'crash', 'cephfs-mirror')
 
 ##################################
 
@@ -2274,7 +2274,7 @@ def get_container_mounts(ctx, fsid, daemon_type, daemon_id,
             mounts[data_dir] = cdata_dir + ':z'
         if not no_config:
             mounts[data_dir + '/config'] = '/etc/ceph/ceph.conf:z'
-        if daemon_type == 'rbd-mirror' or daemon_type == 'crash':
+        if daemon_type in ['rbd-mirror', 'crash', 'cephfs-mirror']:
             # these do not search for their keyrings in a data directory
             mounts[data_dir + '/keyring'] = '/etc/ceph/ceph.client.%s.%s.keyring' % (daemon_type, daemon_id)
 
@@ -2371,6 +2371,9 @@ def get_container(ctx: CephadmContext,
     elif daemon_type == 'rbd-mirror':
         entrypoint = '/usr/bin/rbd-mirror'
         name = 'client.rbd-mirror.%s' % daemon_id
+    elif daemon_type == 'cephfs-mirror':
+        entrypoint = '/usr/bin/cephfs-mirror'
+        name = 'cephfs-mirror.%s' % daemon_id
     elif daemon_type == 'crash':
         entrypoint = '/usr/bin/ceph-crash'
         name = 'client.crash.%s' % daemon_id
@@ -2413,6 +2416,8 @@ def get_container(ctx: CephadmContext,
         container_args.extend(monitoring_args)
     elif daemon_type == 'crash':
         ceph_args = ['-n', name]
+    elif daemon_type == 'cephfs-mirror':
+        ceph_args = ['--id', name, '-f']
     elif daemon_type in Ceph.daemons:
         ceph_args = ['-n', name, '-f']
 
@@ -2888,7 +2893,7 @@ def install_base_units(ctx, fsid):
     compress
     sharedscripts
     postrotate
-        killall -q -1 ceph-mon ceph-mgr ceph-mds ceph-osd ceph-fuse radosgw rbd-mirror || pkill -1 -x "ceph-mon|ceph-mgr|ceph-mds|ceph-osd|ceph-fuse|radosgw|rbd-mirror" || true
+        killall -q -1 ceph-mon ceph-mgr ceph-mds ceph-osd ceph-fuse radosgw rbd-mirror cephfs-mirror || pkill -1 -x "ceph-mon|ceph-mgr|ceph-mds|ceph-osd|ceph-fuse|radosgw|rbd-mirror|cephfs-mirror" || true
     endscript
     missingok
     notifempty

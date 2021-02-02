@@ -21,7 +21,7 @@ class CephadmNoImage(Enum):
 
 # ceph daemon types that use the ceph container image.
 # NOTE: listed in upgrade order!
-CEPH_UPGRADE_ORDER = ['mgr', 'mon', 'crash', 'osd', 'mds', 'rgw', 'rbd-mirror']
+CEPH_UPGRADE_ORDER = ['mgr', 'mon', 'crash', 'osd', 'mds', 'rgw', 'rbd-mirror', 'cephfs-mirror']
 
 
 # Used for _run_cephadm used for check-host etc that don't require an --image parameter
@@ -39,7 +39,7 @@ def name_to_config_section(name: str) -> ConfEntity:
     Map from daemon names to ceph entity names (as seen in config)
     """
     daemon_type = name.split('.', 1)[0]
-    if daemon_type in ['rgw', 'rbd-mirror', 'nfs', 'crash', 'iscsi']:
+    if daemon_type in ['rgw', 'rbd-mirror', 'cephfs-mirror', 'nfs', 'crash', 'iscsi']:
         return ConfEntity('client.' + name)
     elif daemon_type in ['mon', 'osd', 'mds', 'mgr', 'client']:
         return ConfEntity(name)

@@ -43,7 +43,8 @@ from . import remotes
 from . import utils
 from .migrations import Migrations
 from .services.cephadmservice import MonService, MgrService, MdsService, RgwService, \
-    RbdMirrorService, CrashService, CephadmService, CephadmExporter, CephadmExporterConfig
+    RbdMirrorService, CrashService, CephadmService, CephadmExporter, CephadmExporterConfig, \
+    CephfsMirrorService
 from .services.container import CustomContainerService
 from .services.iscsi import IscsiService
 from .services.ha_rgw import HA_RGWService
@@ -419,6 +420,7 @@ class CephadmOrchestrator(orchestrator.Orchestrator, MgrModule,
         self.mds_service = MdsService(self)
         self.rgw_service = RgwService(self)
         self.rbd_mirror_service = RbdMirrorService(self)
+        self.cephfs_mirror_service = CephfsMirrorService(self)
         self.grafana_service = GrafanaService(self)
         self.alertmanager_service = AlertmanagerService(self)
         self.prometheus_service = PrometheusService(self)
@@ -435,6 +437,7 @@ class CephadmOrchestrator(orchestrator.Orchestrator, MgrModule,
             'mds': self.mds_service,
             'rgw': self.rgw_service,
             'rbd-mirror': self.rbd_mirror_service,
+            'cephfs-mirror': self.cephfs_mirror_service,
             'nfs': self.nfs_service,
             'grafana': self.grafana_service,
             'alertmanager': self.alertmanager_service,
@@ -2025,6 +2028,7 @@ class CephadmOrchestrator(orchestrator.Orchestrator, MgrModule,
                 'ha-rgw': PlacementSpec(count=2),
                 'iscsi': PlacementSpec(count=1),
                 'rbd-mirror': PlacementSpec(count=2),
+                'cephfs-mirror': PlacementSpec(count=2),
                 'nfs': PlacementSpec(count=1),
                 'grafana': PlacementSpec(count=1),
                 'alertmanager': PlacementSpec(count=1),
@@ -2099,6 +2103,14 @@ class CephadmOrchestrator(orchestrator.Orchestrator, MgrModule,
 
     @trivial_completion
     def apply_rbd_mirror(self, spec: ServiceSpec) -> str:
+        return self._apply(spec)
+
+    @trivial_completion
+    def add_cephfs_mirror(self, spec: ServiceSpec) -> List[str]:
+        return self._add_daemon('cephfs-mirror', spec, self.cephfs_mirror_service.prepare_create)
+
+    @trivial_completion
+    def apply_cephfs_mirror(self, spec: ServiceSpec) -> str:
         return self._apply(spec)
 
     @trivial_completion

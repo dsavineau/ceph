@@ -57,6 +57,8 @@ while ! bin/ceph mon dump | grep 'epoch 2' ; do sleep 1 ; done
 
 bin/ceph orch apply rbd-mirror 1
 
+bin/ceph orch apply cephfs-mirror 1
+
 bin/ceph orch apply node-exporter '*'
 bin/ceph orch apply prometheus 1
 bin/ceph orch apply alertmanager 1
@@ -73,6 +75,7 @@ bin/ceph orch ls
 bin/ceph orch rm mds.foo
 bin/ceph orch rm rgw.myrealm.myzone
 bin/ceph orch rm rbd-mirror
+bin/ceph orch rm cephfs-mirror
 bin/ceph orch rm node-exporter
 bin/ceph orch rm alertmanager
 bin/ceph orch rm grafana

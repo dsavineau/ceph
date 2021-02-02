@@ -3,7 +3,8 @@ import pytest
 from unittest.mock import MagicMock, call
 
 from cephadm.services.cephadmservice import MonService, MgrService, MdsService, RgwService, \
-    RbdMirrorService, CrashService, CephadmService, AuthEntity, CephadmExporter
+    RbdMirrorService, CrashService, CephadmService, AuthEntity, CephadmExporter, \
+    CephfsMirrorService
 from cephadm.services.iscsi import IscsiService
 from cephadm.services.nfs import NFSService
 from cephadm.services.osd import RemoveUtil, OSDRemovalQueue, OSDService, OSD, NotFoundError
@@ -53,6 +54,7 @@ class TestCephadmService:
         mds_service = MdsService(mgr)
         rgw_service = RgwService(mgr)
         rbd_mirror_service = RbdMirrorService(mgr)
+        cephfs_mirror_service = CephfsMirrorService(mgr)
         grafana_service = GrafanaService(mgr)
         alertmanager_service = AlertmanagerService(mgr)
         prometheus_service = PrometheusService(mgr)
@@ -67,6 +69,7 @@ class TestCephadmService:
             'mds': mds_service,
             'rgw': rgw_service,
             'rbd-mirror': rbd_mirror_service,
+            'cephfs-mirror': cephfs_mirror_service,
             'nfs': nfs_service,
             'grafana': grafana_service,
             'alertmanager': alertmanager_service,
@@ -106,7 +109,7 @@ class TestCephadmService:
         mgr = FakeMgr()
         cephadm_services = self._get_services(mgr)
 
-        for daemon_type in ['rgw', 'rbd-mirror', 'nfs', "iscsi"]:
+        for daemon_type in ['rgw', 'rbd-mirror', 'cephfs-mirror', 'nfs', "iscsi"]:
             assert "client.%s.id1" % (daemon_type) == \
                 cephadm_services[daemon_type].get_auth_entity("id1", "host")
             assert "client.%s.id1" % (daemon_type) == \

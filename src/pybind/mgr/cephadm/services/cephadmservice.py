@@ -298,7 +298,7 @@ class CephService(CephadmService):
         """
         # despite this mapping entity names to daemons, self.TYPE within
         # the CephService class refers to service types, not daemon types
-        if self.TYPE in ['rgw', 'rbd-mirror', 'nfs', "iscsi", 'ha-rgw']:
+        if self.TYPE in ['rgw', 'rbd-mirror', 'cephfs-mirror', 'nfs', "iscsi", 'ha-rgw']:
             return AuthEntity(f'client.{self.TYPE}.{daemon_id}')
         elif self.TYPE == 'crash':
             if host == "":
@@ -781,6 +781,27 @@ class RbdMirrorService(CephService):
             'entity': self.get_auth_entity(daemon_id),
             'caps': ['mon', 'profile rbd-mirror',
                      'osd', 'profile rbd'],
+        })
+
+        daemon_spec.keyring = keyring
+
+        return daemon_spec
+
+
+class CephfsMirrorService(CephService):
+    TYPE = 'cephfs-mirror'
+
+    def prepare_create(self, daemon_spec: CephadmDaemonSpec) -> CephadmDaemonSpec:
+        assert self.TYPE == daemon_spec.daemon_type
+        daemon_id, host = daemon_spec.daemon_id, daemon_spec.host
+
+        ret, keyring, err = self.mgr.check_mon_command({
+            'prefix': 'auth get-or-create',
+            'entity': self.get_auth_entity(daemon_id),
+            'caps': ['mon', 'allow r',
+                     'mds', 'allow r',
+                     'mgr', 'allow r',
+                     'osd', 'allow rw tag cephfs metadata=*, allow r tag cephfs data=*'],
         })
 
         daemon_spec.keyring = keyring

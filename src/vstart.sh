@@ -760,7 +760,7 @@ $out_dir
     postrotate
         # NOTE: assuring that the absence of one of the following processes
         # won't abort the logrotate command.
-        killall -u $USER -q -1 ceph-mon ceph-mgr ceph-mds ceph-osd ceph-fuse radosgw rbd-mirror || echo ""
+        killall -u $USER -q -1 ceph-mon ceph-mgr ceph-mds ceph-osd ceph-fuse radosgw rbd-mirror cephfs-mirror || echo ""
     endscript
 }
 EOF

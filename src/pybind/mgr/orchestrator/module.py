@@ -41,6 +41,7 @@ class ServiceType(enum.Enum):
     mon = 'mon'
     mgr = 'mgr'
     rbd_mirror = 'rbd-mirror'
+    cephfs_mirror = 'cephfs-mirror'
     crash = 'crash'
     alertmanager = 'alertmanager'
     grafana = 'grafana'
@@ -894,6 +895,8 @@ Usage:
             completion = self.add_mgr(spec)
         elif daemon_type == ServiceType.rbd_mirror:
             completion = self.add_rbd_mirror(spec)
+        elif daemon_type == ServiceType.cephfs_mirror:
+            completion = self.add_cephfs_mirror(spec)
         elif daemon_type == ServiceType.crash:
             completion = self.add_crash(spec)
         elif daemon_type == ServiceType.alertmanager:

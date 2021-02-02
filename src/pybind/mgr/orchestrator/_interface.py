@@ -899,6 +899,7 @@ class Orchestrator(object):
             'osd': lambda dg: self.apply_drivegroups([dg]),
             'prometheus': self.apply_prometheus,
             'rbd-mirror': self.apply_rbd_mirror,
+            'cephfs-mirror': self.apply_cephfs_mirror,
             'rgw': self.apply_rgw,
             'ha-rgw': self.apply_ha_rgw,
             'host': self.add_host,
@@ -1079,6 +1080,14 @@ class Orchestrator(object):
         """Update rbd-mirror cluster"""
         raise NotImplementedError()
 
+    def add_cephfs_mirror(self, spec: ServiceSpec) -> Completion[List[str]]:
+        """Create cephfs-mirror daemon(s)"""
+        raise NotImplementedError()
+
+    def apply_cephfs_mirror(self, spec: ServiceSpec) -> Completion[str]:
+        """Update cephfs-mirror cluster"""
+        raise NotImplementedError()
+
     def add_nfs(self, spec: NFSServiceSpec) -> Completion[List[str]]:
         """Create NFS daemon(s)"""
         raise NotImplementedError()
@@ -1198,6 +1207,7 @@ def daemon_type_to_service(dtype: str) -> str:
         'keepalived': 'ha-rgw',
         'iscsi': 'iscsi',
         'rbd-mirror': 'rbd-mirror',
+        'cephfs-mirror': 'cephfs-mirror',
         'nfs': 'nfs',
         'grafana': 'grafana',
         'alertmanager': 'alertmanager',
@@ -1220,6 +1230,7 @@ def service_to_daemon_types(stype: str) -> List[str]:
         'ha-rgw': ['haproxy', 'keepalived'],
         'iscsi': ['iscsi'],
         'rbd-mirror': ['rbd-mirror'],
+        'cephfs-mirror': ['cephfs-mirror'],
         'nfs': ['nfs'],
         'grafana': ['grafana'],
         'alertmanager': ['alertmanager'],
